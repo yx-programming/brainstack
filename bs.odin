@@ -52,24 +52,31 @@ interpreter_run :: proc(using interpreter: ^Interpreter) {
 	for i := 0; i < len(program); i += 1 {
 		instruction := program[i];
 		switch instruction {
+		// Put a byte on the stack
 		case '#':
 			stack_push(&data, parse_hex_digit(program[i + 1:i + 3]));
 			i += 2;
+		// Pop the stack and print the value
 		case '.': fmt.printf("%X\n", stack_pop(&data));
+		// Duplicate the top of the stack
 		case ':': 
 			val := stack_pop(&data);
 			stack_push(&data, val); stack_push(&data, val);
+		// Swaps the position of the top two values on the stack
 		case '~':
 			val1 := stack_pop(&data);
 			val2 := stack_pop(&data);
 			stack_push(&data, val1);
 			stack_push(&data, val2);
+		// Adds the top two values of the stack and pushes the result
 		case '+':
 			val1, val2 := stack_pop(&data), stack_pop(&data);
 			stack_push(&data, val2 + val1);
+		// Subtracts tos from sos and pushes the result
 		case '-':
 			val1, val2 := stack_pop(&data), stack_pop(&data);
 			stack_push(&data, val2 - val1);
+		// Seeks the matching `]`
 		case '[':
 			val := stack_pop(&data);
 			stack_push(&data, val);
@@ -83,6 +90,7 @@ interpreter_run :: proc(using interpreter: ^Interpreter) {
 					}
 				}
 			}
+		// Seeks the matching `[` backwards
 		case ']':
 			val := stack_pop(&data);
 			stack_push(&data, val);
